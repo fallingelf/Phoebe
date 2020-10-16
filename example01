@@ -8,19 +8,56 @@ logger = phoebe.logger('error')
 b = phoebe.default_binary()
 
 print(b['constraint'])
+
 print(b['component'])
 
 b = phoebe.default_binary()
 b.add_constraint('semidetached', 'secondary')
 
-b['period@binary@component']=0.14*u.d
+phases = phoebe.linspace(0,1,101)
+b.add_dataset('lc', times=b.to_time(phases),dataset='lc01',overwrite=True)
 
-b.flip_constraint('mass@primary@constraint',solve_for='sma@binary')
-b['mass@primary@component']=0.8*u.solMass
+b['period@binary@component']=0.14*u.d
 b['requiv@primary@component']=0.01*u.solRad
 
+b.flip_constraint('mass@primary', solve_for='sma@binary')
 b.flip_constraint('mass@secondary@constraint',solve_for='q')
+
+b['mass@primary@component']=0.8*u.solMass
 b['mass@secondary@component']=0.22*u.solMass
 
-b.add_dataset('lc',calculate_phase=np.linspace(0,1,100))
+b['teff@primary@component']=20000*u.K
+b['teff@secondary@component']=3000*u.K
+
+b.set_value('atm', component='primary', value='blackbody')
+b.set_value('ld_mode', component='primary', value='manual')
+b.set_value('ld_func', component='primary', value='quadratic')
+b.set_value('ld_coeffs', component='primary', value=[0.1225,0.3086])
+
+b.set_value_all('ld_mode_bol@primary','manual')
+b.set_value_all('ld_func_bol@primary','quadratic')
+b.set_value('ld_coeffs_bol', component='primary', value=[0.1421,0.3693])
+
+b.set_value('atm@secondary', value='blackbody')
+b.set_value('ld_mode', component='secondary', value='manual')
+b.set_value('ld_func', component='secondary', value='quadratic')
+b.set_value('ld_coeffs', component='secondary', value=[0.1225,0.3086])
+b.set_value_all('ld_mode_bol@secondary','manual')
+b.set_value_all('ld_func_bol@secondary','quadratic')
+b.set_value('ld_coeffs_bol', component='secondary', value=[0.1421,0.3693])
+
+b['atm@secondary'].choices
+
+print(b['compute'])
+
+b.set_value_all('ntriangles', value=20000) #avoid ERROR:  triangles on ['secondary'] may be larger than the entire bodies of ['primary']
+
+b['gravb_bol@primary'] = 1
+b['irrad_frac_refl_bol@primary']=1
+
 print(b.run_checks())
+
+b.run_compute(model='model01',overwrite=True)
+
+afig, mplfig = b.plot(x='phases', show=True)
+
