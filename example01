@@ -1,0 +1,26 @@
+import phoebe
+from phoebe import u # units
+import numpy as np
+import matplotlib.pyplot as plt
+
+logger = phoebe.logger('error')
+
+b = phoebe.default_binary()
+
+print(b['constraint'])
+print(b['component'])
+
+b = phoebe.default_binary()
+b.add_constraint('semidetached', 'secondary')
+
+b['period@binary@component']=0.14*u.d
+
+b.flip_constraint('mass@primary@constraint',solve_for='sma@binary')
+b['mass@primary@component']=0.8*u.solMass
+b['requiv@primary@component']=0.01*u.solRad
+
+b.flip_constraint('mass@secondary@constraint',solve_for='q')
+b['mass@secondary@component']=0.22*u.solMass
+
+b.add_dataset('lc',calculate_phase=np.linspace(0,1,100))
+print(b.run_checks())
