@@ -1,0 +1,15 @@
+print(b['system'])
+
+ParameterSet: 9 parameters
+                        t0@system: 0.0 d
+                        ra@system: 0.0 deg
+                       dec@system: 0.0 deg
+                  distance@system: 1.0 m
+                    vgamma@system: 0.0 km / s
+C                      ebv@system: 0.0
+                        Av@system: 0.0
+                        Rv@system: 3.1
+                 hierarchy@system: orbit:binary(star:primary, star:secondary)
+
+
+
