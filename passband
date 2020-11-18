@@ -1,0 +1,7 @@
+phoebe.update_passband('Johnson:V')
+
+phoebe.list_installed_passbands()
+
+phoebe.list_passband_directories()
+['/home/wqs/.local/lib/python3.7/site-packages/phoebe/atmospheres/tables/passbands/',
+ '/home/wqs/.phoebe/atmospheres/tables/passbands/']
