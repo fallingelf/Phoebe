@@ -1,5 +1,4 @@
-print(b['system'])
-
+#print(b['system'])
 ParameterSet: 9 parameters
                         t0@system: 0.0 d
                         ra@system: 0.0 deg
@@ -11,5 +10,116 @@ C                      ebv@system: 0.0
                         Rv@system: 3.1
                  hierarchy@system: orbit:binary(star:primary, star:secondary)
 
+#print(b['constraint'])
+ParameterSet: 28 parameters
+                   ebv@constraint: {Av@system} / {Rv@system}
+          freq@primary@constraint: 6.283185 / {period@primary@component}
+          logg@primary@constraint: log10((({mass@primary@component} / ({requiv@primary@component} ** 2.000000)) * 2942.206218) * 9.319541)
+   irrad_frac_lost_bol@primary...: 1.000000 - {irrad_frac_refl_bol@primary@component}
+        freq@secondary@constraint: 6.283185 / {period@secondary@component}
+        logg@secondary@constraint: log10((({mass@secondary@component} / ({requiv@secondary@component} ** 2.000000)) * 2942.206218) * 9.319541)
+   irrad_frac_lost_bol@seconda...: 1.000000 - {irrad_frac_refl_bol@secondary@component}
+          asini@binary@constraint: {sma@binary@component} * (sin({incl@binary@component}))
+            t0_perpass@constraint: t0_supconj_to_perpass({t0_supconj@binary@component}, {period@binary@component}, {ecc@binary@component}, {per0@binary@component}, {dpdt@binary@component}, {dperdt@binary@component}, {t0@system})
+                t0_ref@constraint: t0_supconj_to_ref({t0_supconj@binary@component}, {period@binary@component}, {ecc@binary@component}, {per0@binary@component}, {dpdt@binary@component}, {dperdt@binary@component}, {t0@system})
+             mean_anom@constraint: (6.283185 * ({t0@system} - {t0_perpass@binary@component})) / {period@binary@component}
+                 ecosw@constraint: {ecc@binary@component} * (cos({per0@binary@component}))
+                 esinw@constraint: {ecc@binary@component} * (sin({per0@binary@component}))
+           freq@binary@constraint: 6.283185 / {period@binary@component}
+          mass@primary@constraint: (39.478418 * ({sma@binary@component} ** 3.000000)) / ((({period@binary@component} ** 2.000000) * (1.000000 + {q@binary@component})) * 2942.206217504419328179210424423218)
+           sma@primary@constraint: {sma@binary@component} / (1.000000 + (1.000000 / {q@binary@component}))
+         asini@primary@constraint: ({sma@binary@component} * (sin({incl@binary@component}))) / (1.000000 + (1.000000 / {q@binary@component}))
+        period@primary@constraint: {period@binary@component} / {syncpar@primary@component}
+          incl@primary@constraint: {incl@binary@component} + {pitch@primary@component}
+       long_an@primary@constraint: {long_an@binary@component} + {yaw@primary@component}
+    requiv_max@primary@constraint: requiv_L1({q@binary@component}, {syncpar@primary@component}, {ecc@binary@component}, {sma@binary@component}, {incl@primary@component}, {long_an@primary@component}, {incl@binary@component}, {long_an@binary@component}, 1)
+        mass@secondary@constraint: (39.478418 * ({sma@binary@component} ** 3.000000)) / ((({period@binary@component} ** 2.000000) * (1.000000 + (1.000000 / {q@binary@component}))) * 2942.206217504419328179210424423218)
+         sma@secondary@constraint: {sma@binary@component} / (1.000000 + {q@binary@component})
+       asini@secondary@constraint: ({sma@binary@component} * (sin({incl@binary@component}))) / (1.000000 + {q@binary@component})
+      period@secondary@constraint: {period@binary@component} / {syncpar@secondary@component}
+        incl@secondary@constraint: {incl@binary@component} + {pitch@secondary@component}
+     long_an@secondary@constraint: {long_an@binary@component} + {yaw@secondary@component}
+   requiv_max@secondary@constr...: requiv_L1({q@binary@component}, {syncpar@secondary@component}, {ecc@binary@component}, {sma@binary@component}, {incl@secondary@component}, {long_an@secondary@component}, {incl@binary@component}, {long_an@binary@component}, 2)
+
+#print(b['component'])
+ParameterSet: 59 parameters
+         requiv@primary@component: 1.0 solRad
+C    requiv_max@primary@component: 2.013275176537638 solRad
+           teff@primary@component: 6000.0 K
+           abun@primary@component: 0.0
+C          logg@primary@component: 4.437551877570185
+        syncpar@primary@component: 1.0
+C        period@primary@component: 1.0 d
+C          freq@primary@component: 6.283185 rad / d
+          pitch@primary@component: 0.0 deg
+            yaw@primary@component: 0.0 deg
+C          incl@primary@component: 90.0 deg
+C       long_an@primary@component: 0.0 deg
+      gravb_bol@primary@component: 0.32
+   irrad_frac_refl_bol@primary...: 0.6
+C  irrad_frac_lost_bol@primary...: 0.4
+    ld_mode_bol@primary@component: lookup
+    ld_func_bol@primary@component: logarithmic
+   ld_coeffs_source_bol@primar...: auto
+C          mass@primary@component: 0.9988131358058301 solMass
+       requiv@secondary@component: 1.0 solRad
+C  requiv_max@secondary@component: 2.013275176537638 solRad
+         teff@secondary@component: 6000.0 K
+         abun@secondary@component: 0.0
+C        logg@secondary@component: 4.437551877570185
+      syncpar@secondary@component: 1.0
+C      period@secondary@component: 1.0 d
+C        freq@secondary@component: 6.283185 rad / d
+        pitch@secondary@component: 0.0 deg
+          yaw@secondary@component: 0.0 deg
+C        incl@secondary@component: 90.0 deg
+C     long_an@secondary@component: 0.0 deg
+    gravb_bol@secondary@component: 0.32
+   irrad_frac_refl_bol@seconda...: 0.6
+C  irrad_frac_lost_bol@seconda...: 0.4
+   ld_mode_bol@secondary@compo...: lookup
+   ld_func_bol@secondary@compo...: logarithmic
+   ld_coeffs_source_bol@second...: auto
+C        mass@secondary@component: 0.9988131358058301 solMass
+          period@binary@component: 1.0 d
+C           freq@binary@component: 6.283185 rad / d
+            dpdt@binary@component: 0.0 s / yr
+            per0@binary@component: 0.0 deg
+          dperdt@binary@component: 0.0 deg / yr
+             ecc@binary@component: 0.0
+C     t0_perpass@binary@component: -0.25 d
+      t0_supconj@binary@component: 0.0 d
+C         t0_ref@binary@component: 0.0 d
+C      mean_anom@binary@component: 89.99999559997653 deg
+            incl@binary@component: 90.0 deg
+               q@binary@component: 1.0
+             sma@binary@component: 5.3 solRad
+         long_an@binary@component: 0.0 deg
+C          asini@binary@component: 5.3 solRad
+C          ecosw@binary@component: 0.0
+C          esinw@binary@component: 0.0
+C           sma@primary@component: 2.65 solRad
+C         asini@primary@component: 2.65 solRad
+C         sma@secondary@component: 2.65 solRad
+C       asini@secondary@component: 2.65 solRad
+
+#print(b['compute'])
+ParameterSet: 16 parameters
+     sample_from@phoebe01@compute: []
+        comments@phoebe01@compute: 
+   dynamics_method@phoebe01@co...: keplerian
+            ltte@phoebe01@compute: False
+    irrad_method@phoebe01@compute: horvat
+   boosting_method@phoebe01@co...: none
+   eclipse_method@phoebe01@com...: native
+   horizon_method@phoebe01@com...: boolean
+   mesh_method@primary@phoebe0...: marching
+   mesh_method@secondary@phoeb...: marching
+   ntriangles@primary@phoebe01...: 1500
+   ntriangles@secondary@phoebe...: 1500
+   distortion_method@primary@p...: roche
+   distortion_method@secondary...: roche
+     atm@primary@phoebe01@compute: ck2004
+   atm@secondary@phoebe01@compute: ck2004
 
 
