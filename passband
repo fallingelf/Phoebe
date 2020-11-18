@@ -1,7 +1,21 @@
-phoebe.update_passband('Johnson:V')
+print(phoebe.list_installed_passbands())     #['Bolometric:900-40000', 'Johnson:V']
 
-phoebe.list_installed_passbands()
+phoebe.list_passbands()
+['Johnson:U',  'Gaia:RVS', 'Hipparcos:Hp', 'Tycho:V', 'Cousins:I', 'Tycho:B', 'LSST:g', 'Johnson:B', 'LSST:u', 'Bolometric:900-40000', 'Johnson:V', 'Gaia:G', 'LSST:r', 'LSST:z', 'Gaia:BP', 'Kepler:mean', 'Stromgren:u', 'Johnson:R', 'LSST:y3', 'BRITE:red', 'Stromgren:b', 'Cousins:R', 'TESS:T', 'KELT:R', 'Stromgren:y', 'LSST:i', 'Gaia:RP', 'Johnson:I', 'Stromgren:v', 'BRITE:blue']
 
-phoebe.list_passband_directories()
-['/home/wqs/.local/lib/python3.7/site-packages/phoebe/atmospheres/tables/passbands/',
+phoebe.list_passband_directories()     #the local and global directories
+['/home/wqs/.local/lib/python3.6/site-packages/phoebe/atmospheres/tables/passbands/',
  '/home/wqs/.phoebe/atmospheres/tables/passbands/']
+
+#install from files
+phoebe.install_passband(fname,local=True)
+
+#download
+phoebe.download_passband('Johnson:V') #local=False
+
+#updates
+phoebe.update_all_passbands() #for all passbands
+phoebe.update_passband('Johnson:V') #for single passband such as 'Johnson:V'
+
+
+print(phoebe.list_all_update_passbands_available())
