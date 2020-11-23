@@ -9,6 +9,8 @@ logger = phoebe.logger('error')
 
 b = phoebe.default_binary()
 #b.add_constraint('semidetached', 'secondary')
+b.add_constraint('requivfrac',component='secondary',solve_for='requiv')
+b['value@requivfrac@secondary@component']=0.99
 
 b.set_value('period', component='binary', value=0.14*u.d)
 b.set_value('teff', component='primary', value=30000*u.K)
@@ -108,3 +110,14 @@ default_binary(*args, **kwargs)
     -----------
     * ValueError: if at least one of `semidetached` and `contact_binary` are
         not False.
+        
+        
+  
+b = phoebe.default_binary()
+b.add_constraint('requivfrac', component='primary',solve_for='requiv')
+b['requivfrac@primary@component']=0.9*u.solRad
+print(b['requivfrac@primary@constraint'])
+print('-'*100)
+print(b['requiv@primary@constraint'])
+print('-'*100)
+print(b['sma@binary@constraint'])
