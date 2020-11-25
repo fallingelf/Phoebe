@@ -1,63 +1,70 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov 25 19:25:48 2020
+
+@author: wqs
+"""
+
 import phoebe
 from phoebe import u # units
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 logger = phoebe.logger('error')
 
-b = phoebe.default_binary()
+data_lc=pd.read_csv('/home/wqs/Desktop/Projects/PHOEBE/mnhya/MNHya_160310_C.txt',header=0,sep=' ')
+times=data_lc['JDHEL'].values-2457458
+fluxes=10**(-0.4*data_lc['V-C'].values)
+sigmas=fluxes*np.log(10)*(-0.4)*data_lc['s1'].values
+plt.errorbar(times,fluxes,sigmas)
 
-print(b['constraint'])
-
-print(b['component'])
 
 b = phoebe.default_binary()
 b.add_constraint('semidetached', 'secondary')
 
-phases = phoebe.linspace(0,1,101)
-b.add_dataset('lc', times=b.to_time(phases),dataset='lc01',overwrite=True)
+b.add_dataset('lc', compute_phases=phoebe.linspace(0,1,201),
+              times=times, fluxes=fluxes, sigmas=sigmas, 
+              passband='Johnson:V', dataset='lc01')
 
-b['period@binary@component']=0.14*u.d
-b['requiv@primary@component']=0.01*u.solRad
-
+b.set_value('period', component='binary', value=0.1412437990*u.d)
+b.set_value('teff', component='primary', value=30000*u.K)
+b.set_value('teff', component='secondary', value=3650*u.K)
+b.set_value('requiv', component='primary', value=0.01*u.solRad)
 b.flip_constraint('mass@primary', solve_for='sma@binary')
-b.flip_constraint('mass@secondary@constraint',solve_for='q')
+b.set_value('mass', component='primary', value=1.2*u.solMass)
+b.flip_constraint('mass@secondary', solve_for='q')
+b.set_value('mass', component='secondary', value=0.42*u.solMass)
+b.set_value('t0_supconj', component='binary', value=0.62831)
 
-b['mass@primary@component']=0.8*u.solMass
-b['mass@secondary@component']=0.22*u.solMass
 
-b['teff@primary@component']=20000*u.K
-b['teff@secondary@component']=3000*u.K
+b.add_solver('estimator.lc_geometry', lc='lc01',overwrite=True)
+b.run_solver(kind='lc_geometry', solution='lc_geom_sol', overwrite=True)
+print(b.adopt_solution('lc_geom_sol', trial_run=True))
+
+b.add_solver('estimator.ebai', lc='lc01')
+b.run_solver(kind='ebai', solution='ebai_sol')
+print(b.adopt_solution('ebai_sol', trial_run=True))
+
 
 b.set_value('atm', component='primary', value='blackbody')
 b.set_value('ld_mode', component='primary', value='manual')
 b.set_value('ld_func', component='primary', value='quadratic')
-b.set_value('ld_coeffs', component='primary', value=[0.1225,0.3086])
-
+b.set_value('ld_coeffs', component='primary', dataset='lc01', value=[0.1225,0.3086])
 b.set_value_all('ld_mode_bol@primary','manual')
 b.set_value_all('ld_func_bol@primary','quadratic')
 b.set_value('ld_coeffs_bol', component='primary', value=[0.1421,0.3693])
 
-b.set_value('atm@secondary', value='blackbody')
-b.set_value('ld_mode', component='secondary', value='manual')
-b.set_value('ld_func', component='secondary', value='quadratic')
-b.set_value('ld_coeffs', component='secondary', value=[0.1225,0.3086])
-b.set_value_all('ld_mode_bol@secondary','manual')
-b.set_value_all('ld_func_bol@secondary','quadratic')
-b.set_value('ld_coeffs_bol', component='secondary', value=[0.1421,0.3693])
+b.set_value_all('atm', component='secondary', value='phoenix')
+b.set_value('abun', component='secondary', value=0)
 
-b['atm@secondary'].choices
-
-print(b['compute'])
-
-b.set_value_all('ntriangles', value=20000) #avoid ERROR:  triangles on ['secondary'] may be larger than the entire bodies of ['primary']
+b['distortion_method@primary']='sphere'
+b.set_value('ntriangles@secondary', value=10000)
 
 b['gravb_bol@primary'] = 1
 b['irrad_frac_refl_bol@primary']=1
 
 print(b.run_checks())
-
-b.run_compute(model='model01',overwrite=True)
-
-afig, mplfig = b.plot(x='phases', show=True)
-
+b.run_compute(model='WD_RD',overwrite=True)
+b.plot(show=True)
