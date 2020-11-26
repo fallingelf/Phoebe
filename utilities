@@ -1,0 +1,56 @@
+def WD_MR(M1):
+    '''
+    Nauenberg 1972
+    '''
+    if not isinstance(M1,float):
+        M1=(M1.to('solMass')).value
+        
+    R1=7.79*10**8*((1.44/M1)**(2/3)-(M1/1.44)**(2/3))**0.5*u.cm
+    
+    return (R1.to('solRad')).value
+
+def RD_MR(M2):
+    '''
+    the relation of mass and radius of the donor in cataclysmic variables 
+    doi:10.1093/mnras/stz976 
+    '''
+    if not isinstance(M2,float):
+        M2=(M2.to('solMass')).value
+        
+    Mbounce=0.063
+    Mconv=0.2
+    Mevol=0.8
+    if M2<Mbounce:
+        R2=0.109*(M2/Mbounce)**0.152
+    elif (M2<=Mconv) & (M2>=Mbounce):
+        R2=0.225*(M2/Mconv)**0.636
+    elif (M2>Mconv) & (M2<=Mevol):
+        R2=0.293*(M2/Mconv)**0.69
+    else:
+        sys.exit('M2 is out the range (M2 <= 0.8 M_sun)')
+    return R2
+
+def RD_RM(R2):
+    '''
+    the relation of mass and radius of the donor in cataclysmic variables 
+    doi:10.1093/mnras/stz976 
+    '''
+    if not isinstance(R2,float):
+        R2=(R2.to('solRad')).value
+        
+    Mbounce=0.063
+    Mconv=0.2
+    Mevol=0.8
+
+    M2_boun=(R2/0.109)**(1/0.152)*Mbounce
+    M2_conv=(R2/0.225)**(1/0.636)*Mconv
+    M2_evol=(R2/0.293)**(1/0.69)*Mconv
+    if M2_boun<Mbounce:
+        M2 = M2_boun
+    elif (M2_conv<=Mconv) & (M2_conv>=Mbounce):
+        M2 = M2_conv
+    elif (M2_evol>Mconv) & (M2_evol<=Mevol):
+        M2 = M2_evol
+    else: 
+        sys.exit('M2 is out the range (M2 <= 0.8 M_sun)')
+    return M2
