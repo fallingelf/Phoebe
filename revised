@@ -1,1 +1,92 @@
+#phoebe.parameters.constraint.py
+
+_validsolvefor['semidetached'] = ['requiv']
+def semidetached(b, component, solve_for=None, **kwargs):
+    """
+    Create a constraint to force requiv to be semidetached.
+
+    This is usually passed as an argument to
+     <phoebe.frontend.bundle.Bundle.add_constraint> as
+     `b.add_constraint('semidetached', component='primary')`, where `component` is
+     one of <phoebe.parameters.HierarchyParameter.get_stars>.
+
+    Arguments
+    -----------
+    * `b` (<phoebe.frontend.bundle.Bundle>): the Bundle
+    * `component` (string): the label of the orbit or component in which this
+        constraint should be built.
+    * `solve_for` (<phoebe.parameters.Parameter>, optional, default=None): if
+        'requiv' should not be the derived/constrained parameter, provide which
+        other parameter should be derived (ie 'requiv_max').
+
+    Returns
+    ----------
+    * (<phoebe.parameters.Parameter>, <phoebe.parameters.ConstraintParameter>, list):
+        lhs (Parameter), rhs (ConstraintParameter), addl_params (list of additional
+        parameters that may be included in the constraint), kwargs (dict of
+        keyword arguments that were passed to this function).
+
+    Raises
+    --------
+    * NotImplementedError: if the value of `solve_for` is not implemented.
+    """
+    comp_ps = b.get_component(component=component, **_skip_filter_checks)
+
+    requiv = comp_ps.get_parameter(qualifier='requiv', **_skip_filter_checks)
+    requiv_critical = comp_ps.get_parameter(qualifier='requiv_max', **_skip_filter_checks)
+
+    if solve_for in [requiv, None]:
+        lhs = requiv
+        rhs = 0.99*requiv_critical
+    else:
+        raise NotImplementedError
+
+    return lhs, rhs, [], {'component': component}
+
+_validsolvefor['whitedwarf'] = ['requiv']
+def whitedwarf(b, component, solve_for=None, **kwargs):
+    """
+    Create a constraint to force a comonent to be a white dwarf.
+
+    This is usually passed as an argument to
+     <phoebe.frontend.bundle.Bundle.add_constraint> as
+     `b.add_constraint('whitedwarf', component='primary')`, where `component` is
+     one of <phoebe.parameters.HierarchyParameter.get_stars>.
+
+    Arguments
+    -----------
+    * `b` (<phoebe.frontend.bundle.Bundle>): the Bundle
+    * `component` (string): the label of the orbit or component in which this
+        constraint should be built.
+    * `solve_for` (<phoebe.parameters.Parameter>, optional, default=None): if
+        'requiv' should not be the derived/constrained parameter, provide which
+        other parameter should be derived (ie 'requiv_max').
+
+    Returns
+    ----------
+    * (<phoebe.parameters.Parameter>, <phoebe.parameters.ConstraintParameter>, list):
+        lhs (Parameter), rhs (ConstraintParameter), addl_params (list of additional
+        parameters that may be included in the constraint), kwargs (dict of
+        keyword arguments that were passed to this function).
+
+    Raises
+    --------
+    * NotImplementedError: if the value of `solve_for` is not implemented.
+    """
+    comp_ps = b.get_component(component=component, **_skip_filter_checks)
+
+    requiv = comp_ps.get_parameter(qualifier='requiv', **_skip_filter_checks)
+    requiv_critical = comp_ps.get_parameter(qualifier='requiv_max', **_skip_filter_checks)
+    wd_mass = comp_ps.get_parameter(qualifier='mass', **_skip_filter_checks)
+    m1=wd_mass.get_value(unit=u.solMass)
+    wd_radius=(7.79*10**8*((1.44/m1)**(2/3)-(m1/1.44)**(2/3))**0.5*u.cm).to('solRad').value
+    factor_radius=wd_radius/requiv_critical.get_value(unit=u.solRad)
+    
+    if solve_for in [requiv, None]:
+        lhs = requiv
+        rhs = factor_radius*requiv_critical
+    else:
+        raise NotImplementedError
+
+    return lhs, rhs, [], {'component': component}
 
