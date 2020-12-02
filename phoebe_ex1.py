@@ -60,7 +60,15 @@ fig, mplfig = b['mesh@model'].plot(phase=0.0, show=True,
 
 
 
+import phoebe
 
+b = phoebe.default_binary()
+b.add_constraint('semidetached', 'primary')
+b.add_dataset('mesh', compute_times=[0], columns=['teffs', 'loggs'])
+b.run_compute()
+print("teffs {}-{}".format(min(b.get_value('teffs', component='primary')), max(b.get_value('teffs', component='primary'))))
+print("loggs {}-{}".format(min(b.get_value('loggs', component='primary')), max(b.get_value('loggs', component='primary'))))
+b.plot(x='ws', fc='teffs', show=True)
 
 
 
