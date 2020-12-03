@@ -71,7 +71,61 @@ print("loggs {}-{}".format(min(b.get_value('loggs', component='primary')), max(b
 b.plot(x='ws', fc='teffs', show=True)
 
 
+import matplotlib.pyplot as plt
 
+plt.rc('font', family='serif', size=14, serif='STIXGeneral')
+plt.rc('mathtext', fontset='stix')
+
+import phoebe,ellc
+import numpy as np
+from phoebe import u # units
+
+logger = phoebe.logger('error',filename='mylog.log')
+
+print(phoebe.conf.interactive_constraints)
+phoebe.interactive_constraints_on()
+
+# we'll set the random seed so that the noise model is reproducible
+np.random.seed(123456789)
+
+b = phoebe.default_binary()
+
+b.flip_constraint('mass@primary', solve_for='sma@binary')
+b.set_value('mass', component='primary', value=1*u.solMass)
+b.flip_constraint('mass@secondary', solve_for='q')
+b.set_value('mass', component='secondary', value=0.3*u.solMass)
+b.set_value('teff@primary', 7000)
+b.set_value('teff@secondary', 6000)
+b.set_value('incl@binary', 80)
+b.set_value('t0_supconj', 0.1)
+b.set_value('requiv@primary', 0.01)
+b.set_value('requiv@secondary', 1.287)
+
+#print(b.filter(qualifier=['ecc', 'per0', 'teff', 'sma', 'incl', 'q', 'requiv'], context='component'))
+
+lctimes = phoebe.linspace(0, 1, 101)
+b.add_dataset('lc', compute_times=lctimes)
+
+b.add_compute('ellc', compute='fastcompute')
+
+b.set_value_all('atm', component='primary', value='blackbody')
+b.set_value_all('ld_mode', component='primary', value='manual')
+b.set_value_all('ld_func', component='primary', value='linear')
+b.set_value_all('ld_coeffs', component='primary', dataset='lc01', value=[0])
+b.set_value_all('ld_mode_bol@primary','manual')
+b.set_value_all('ld_func_bol@primary','linear')
+b.set_value_all('ld_coeffs_bol', component='primary', value=[0])
+b.set_value_all('atm', component='secondary', value='phoenix')
+b.set_value_all('ld_mode', component='secondary', value='lookup')
+
+b.set_value_all('distortion_method@primary', value='sphere')
+b.set_value_all('ntriangles@secondary', value=25000)
+
+# b.run_compute()
+
+b.run_compute(compute='fastcompute', pblum_method='phoebe')
+
+afig, mplfig = b.plot('lc01', x='phases', show=True)
 
 
 
