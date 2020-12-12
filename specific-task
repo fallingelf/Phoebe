@@ -90,3 +90,12 @@ def whitedwarf(b, component, solve_for=None, **kwargs):
 
     return lhs, rhs, [], {'component': component}
 
+#phoebe/backend/universe.py#1263
+        atm = b.get_value(qualifier='atm', compute=compute, component=component, atm=atm_override, **_skip_filter_checks) 
+        if atm_override is not None:
+            atm = b.get_value(qualifier='atm', compute=compute, component=component, atm=atm_override[component], **_skip_filter_checks) 
+        else:
+            try:
+                atm = b.get_value(qualifier='atm', compute=compute, component=component, atm=atm_override, **_skip_filter_checks) 
+            except:
+                atm = 'ck2004'
