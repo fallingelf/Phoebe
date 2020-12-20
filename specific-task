@@ -1,4 +1,4 @@
-#phoebe.parameters.constraint.py
+#phoebe.parameters.constraint.py#1083
 
 _validsolvefor['semidetached'] = ['requiv']
 def semidetached(b, component, solve_for=None, **kwargs):
@@ -85,6 +85,92 @@ def whitedwarf(b, component, solve_for=None, **kwargs):
     if solve_for in [requiv, None]:
         lhs = requiv
         rhs = factor_radius*requiv_critical
+    else:
+        raise NotImplementedError
+
+    return lhs, rhs, [], {'component': component}
+
+_validsolvefor['mass'] = ['mass', 'requiv']
+def cvdonor(b, component, solve_for=None, **kwargs):
+    """
+    Create a constraint for the mass of a star based on (1) the mass-radius for 
+    the donor in cataclysmic variables if the mass < 0.8 solmass or based on 
+    (2) the mass-radius for low mass main sequence star.  
+    (1): ref. doi:10.1093/mnras/stz976
+    (2): ref. Patterson 1984
+    
+    This is usually passed as an argument to
+     <phoebe.frontend.bundle.Bundle.add_constraint> as
+     `b.add_constraint('cvdonor', component='secondary', solve_for='sma')`, where `component` is
+     one of <phoebe.parameters.HierarchyParameter.get_stars>.
+
+    Arguments
+    -----------
+    * `b` (<phoebe.frontend.bundle.Bundle>): the Bundle
+    * `component` (string): the label of the orbit or component in which this
+        constraint should be built.
+    * `solve_for` (<phoebe.parameters.Parameter>, optional, default=None): if
+        'mass' should not be the derived/constrained parameter, provide which
+        other parameter should be derived (ie 'period', 'sma', 'q').  Note:
+        you cannot solve_for 'period' and 'sma' in the same orbit as the solution
+        will not be unique.
+
+    Returns
+    ----------
+    * (<phoebe.parameters.Parameter>, <phoebe.parameters.ConstraintParameter>, list):
+        lhs (Parameter), rhs (ConstraintParameter), addl_params (list of additional
+        parameters that may be included in the constraint), kwargs (dict of
+        keyword arguments that were passed to this function).
+
+    Raises
+    --------
+    * NotImplementedError: if the value of `solve_for` is not implemented.
+    """
+    # TODO: optimize this - this is currently by far the most expensive constraint (due mostly to the parameter multiplication)
+    
+    def _MRdonor(para, solve_for='mass'):  
+          
+        Mbounce=0.063*u.solMass
+        Mconv=0.2*u.solMass
+        Mevol=0.8*u.solMass
+        
+        if solve_for=='mass':
+            para.set_default_unit(unit='solRad')
+            M_boun=(para/(1*u.solRad)/0.109)**(1/0.152)*Mbounce
+            M_conv=(para/(1*u.solRad)/0.225)**(1/0.636)*Mconv
+            M_evol=(para/(1*u.solRad)/0.293)**(1/0.69)*Mconv
+            if M_boun.result<Mbounce:
+                return M_boun
+            elif (M_conv.result<=Mconv) & (M_conv.result>=Mbounce):
+                return M_conv
+            elif (M_evol.result>Mconv) & (M_evol.result<=Mevol):
+                return M_evol
+            else: 
+                return (para/(1*u.solRad))**(1/0.88)*u.solMass
+        elif solve_for=='requiv':
+            para.set_default_unit(unit='solMass')
+            if para.value<Mbounce.value:
+                return 0.109*(para/Mbounce)**0.152*u.solRad
+            elif (para.value<=Mconv.value) & (para.value>=Mbounce.value):
+                return 0.225*(para/Mconv)**0.636*u.solRad
+            elif (para.value>Mconv.value) & (para.value<=Mevol.value):
+                return 0.293*(para/Mconv)**0.69*u.solRad
+            else:
+                return (para/(1*u.solMass))**0.88*u.solRad
+        else:
+            raise NotImplementedError
+
+    component_ps = _get_system_ps(b, component)
+    mass = component_ps.get_parameter(qualifier='mass', **_skip_filter_checks)
+    requiv = component_ps.get_parameter(qualifier='requiv', **_skip_filter_checks)
+
+    if solve_for in [None, mass]:
+        lhs = mass
+        rhs = _MRdonor(requiv, solve_for='mass')
+
+    elif solve_for=='requiv':
+        lhs = requiv
+        rhs = _MRdonor(mass, solve_for='requiv')
     else:
         raise NotImplementedError
 
