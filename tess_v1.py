@@ -30,12 +30,12 @@ b.set_value('period', component='binary', value=0.139613*u.d)
 b.set_value('t0_supconj', component='binary', value=0.2841677980365126)
 b.flip_constraint('mass@secondary', solve_for='sma@binary')
 
-b.set_value('incl', component='binary', value=30.10952829129269*u.deg)
-b.set_value('teff', component='primary', value=229788.95464824955*u.K)
-b.set_value('teff', component='secondary', value=2638.8454077624147*u.K)
-b.set_value('mass', component='secondary', value=0.25*u.solMass)
-b.set_value('q', component='binary', value=0.21776628261552058)
-b['q@binary'].set_limits([0.1736,0.25])
+b.set_value('incl', component='binary', value=35.84199483113191*u.deg)
+b.set_value('teff', component='primary', value=182191.2006931246*u.K)
+b.set_value('teff', component='secondary', value=3514.383865182288*u.K)
+b.set_value('mass', component='secondary', value=0.3*u.solMass)
+b.set_value('q', component='binary', value=0.23136093619138703)
+b['q@binary'].set_limits([0.14,0.5])
 
 b.add_dataset('lc', compute_phases=phoebe.linspace(0,1,101),
               times=times, fluxes=fluxes, sigmas=sigmas, dataset='t', 
@@ -48,11 +48,24 @@ b.add_dataset('lc', compute_phases=phoebe.linspace(0,1,101),
 #               passband='Johnson:R', overwrite=True)
 # b.add_dataset('lc', compute_phases=phoebe.linspace(0,1,101), dataset='i', 
 #               passband='Johnson:I', overwrite=True)
-# b.add_dataset('mesh', compute_phases=[0],overwrite=True, columns=['teffs', 'loggs'])
+# b.add_dataset('mesh', compute_phases=[0,0.25,0.5,0.75], columns=['teffs'])
 
-b['gravb_bol@primary'] = 0
-b['irrad_frac_refl_bol@primary']=0
-b['irrad_frac_refl_bol@secondary']=0.8
+# b.add_feature('spot', component='primary', feature='hotregion1')
+# b.set_value(qualifier='relteff', feature='hotregion1', value=1)
+# b.set_value(qualifier='colat', feature='hotregion1', value=90)
+# b.set_value(qualifier='long', feature='hotregion1', value=90)
+# b.set_value(qualifier='radius', feature='hotregion1', value=30)
+
+# b.add_feature('spot', component='primary', feature='hotregion2')
+# b.set_value(qualifier='relteff', feature='hotregion2', value=1)
+# b.set_value(qualifier='colat', feature='hotregion2', value=90)
+# b.set_value(qualifier='long', feature='hotregion2', value=270)
+# b.set_value(qualifier='radius', feature='hotregion2', value=30)
+
+b['gravb_bol@primary'] = 1
+b['gravb_bol@secondary'] = 0.32
+b['irrad_frac_refl_bol@primary']=1
+b['irrad_frac_refl_bol@secondary']=0.5
 b.set_value_all('atm', value='blackbody')
 b.set_value_all('ld_mode', value='manual')
 b.set_value_all('ld_func', value='linear')
@@ -61,11 +74,12 @@ b.set_value_all('ld_mode_bol','manual')
 b.set_value_all('ld_func_bol','linear')
 b.set_value_all('ld_coeffs_bol', value=[0.])
 b.set_value_all('atm', component='secondary', value='phoenix')
-b.set_value_all('ld_mode', component='secondary', value='lookup')
+b.set_value_all('ld_mode', component='secondary', value='interp')
 b.set_value_all('distortion_method@primary', value='sphere')
 b.set_value_all('pblum_mode', dataset='t', value='dataset-scaled')
 
-# b.run_compute(compute='phoebe01', model='ph01_res_bb', overwrite=True)
+# b.set_value('Rv', value=3.1)
+# b.set_value('Av',1.4)
 
 b.add_solver('optimizer.nelder_mead', 
               fit_parameters=['incl@binary', 'q@binary', 'teff@primary', 'teff@secondary'], 
@@ -75,7 +89,7 @@ print(b.get_solver(kind='nelder_mead'))
 start_t=_time()
 b.run_solver(kind='nelder_mead', maxiter=1000, solution='nm_sol', overwrite=True)
 end_t=_time()
-print('\n\n the total run time is {:.0.1f} min \n'.format((end_t-start_t)/60))
+print('\n\n the total run time is {:.1f} min \n'.format((end_t-start_t)/60))
 print(b.get_solution('nm_sol').filter(qualifier=['message', 'nfev', 'niter', 'success']))
 print(b.adopt_solution('nm_sol', trial_run=True))
 b.adopt_solution('nm_sol')
